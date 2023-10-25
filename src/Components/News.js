@@ -11,7 +11,7 @@ const News = (props) => {
 
   const updateNews = async () => {
     props.setProgress(10);
-    const url = `https://newsapi.org/v2/everything?country=${props.country}&category=${props.category}&apiKey=ac9873bba9c34c37ba020448abbd6d00&page=${page}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=9b1e467c24944afa95f9824c19a10e1e&page=${page}&pageSize=${props.pageSize}`;
     setLoading(true);
     let data = await fetch(url);
     props.setProgress(40);
@@ -27,10 +27,11 @@ const News = (props) => {
   useEffect(() => {
     document.title = `${props.category} | NewsFunnky`;
     updateNews();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.category, page]);
 
   const fetchMoreData = async () => {
-    const url = `https://newsapi.org/v2/everything?country=${props.country}&category=${props.category}&apiKey=ac9873bba9c34c37ba020448abbd6d00&page=${page+1}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=9b1e467c24944afa95f9824c19a10e1e&page=${page + 1}&pageSize=${props.pageSize}`;
     setPage(page + 1);
     let data = await fetch(url);
     let parsedData = await data.json();
@@ -43,32 +44,27 @@ const News = (props) => {
       dataLength={articles.length}
       next={fetchMoreData}
       hasMore={articles.length !== totalResults}
-      loader={<h1 style={{ textAlign: "center" }}>...</h1>}
+      loader={<h1 style={{ textAlign: "center" }}>Loading...</h1>}
     >
       <div className="container my-3">
-        <h1
-          className="text-center"
-          style={{ marginTop: "80px", marginBottom: "20px" }}
-        >
+        <h1 className="text-center" style={{ marginTop: "80px", marginBottom: "20px" }}>
           NewsFunnky - Top {props.category} Headlines
         </h1>
-        {loading}
+        {loading && <p>...</p>}
         <div className="row">
-          {articles.map((element) => {
-            return (
-              <div className="col-md-4" key={element.url}>
-                <NewsItem
-                  title={element.title}
-                  description={element.description}
-                  imgUrl={element.urlToImage}
-                  newsUrl={element.url}
-                  author={element.author}
-                  date={element.publishedAt}
-                  source={element.source.name}
-                />
-              </div>
-            );
-          })}
+          {articles.map((element) => (
+            <div className="col-md-4" key={element.url}>
+              <NewsItem
+                title={element.title}
+                description={element.description}
+                imgUrl={element.urlToImage}
+                newsUrl={element.url}
+                author={element.author}
+                date={element.publishedAt}
+                source={element.source.name}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </InfiniteScroll>
